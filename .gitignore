@@ -1,0 +1,9 @@
+.DS_Store
+bin/
+/.idea
+.idea
+.env
+.vscode
+TABLES
+go.mod
+go.sum
