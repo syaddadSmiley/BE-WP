@@ -2,10 +2,12 @@ package repository_test
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"testing"
 
 	"waroeng_pgn1/domain"
+	db "waroeng_pgn1/internal/database"
 	"waroeng_pgn1/internal/repository"
 	"waroeng_pgn1/mongo/mocks"
 
@@ -16,16 +18,16 @@ import (
 
 func TestCreate(t *testing.T) {
 
-	var databaseHelper *mocks.Database
+	var databaseHelper *sql.DB
 	var collectionHelper *mocks.Collection
 
-	databaseHelper = &mocks.Database{}
+	databaseHelper, _ = db.ConnectToDB()
 	collectionHelper = &mocks.Collection{}
 
 	collectionName := domain.CollectionUser
 
 	mockUser := &domain.User{
-		ID:       primitive.NewObjectID(),
+		ID:       primitive.NewObjectID().String(),
 		Name:     "Test",
 		Email:    "test@gmail.com",
 		Password: "password",
@@ -38,7 +40,7 @@ func TestCreate(t *testing.T) {
 
 		collectionHelper.On("InsertOne", mock.Anything, mock.AnythingOfType("*domain.User")).Return(mockUserID, nil).Once()
 
-		databaseHelper.On("Collection", collectionName).Return(collectionHelper)
+		databaseHelper.Query("INSERT INTO users (id, name, email, password) VALUES (?, ?, ?, ?)", mockUser.ID, mockUser.Name, mockUser.Email, mockUser.Password)
 
 		ur := repository.NewUserRepository(databaseHelper, collectionName)
 
@@ -52,7 +54,7 @@ func TestCreate(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		collectionHelper.On("InsertOne", mock.Anything, mock.AnythingOfType("*domain.User")).Return(mockEmptyUser, errors.New("Unexpected")).Once()
 
-		databaseHelper.On("Collection", collectionName).Return(collectionHelper)
+		databaseHelper.Query("INSERT INTO users (id, name, email, password) VALUES (?, ?, ?, ?)", mockUser.ID, mockUser.Name, mockUser.Email, mockUser.Password)
 
 		ur := repository.NewUserRepository(databaseHelper, collectionName)
 

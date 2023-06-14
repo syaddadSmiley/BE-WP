@@ -2,19 +2,19 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"errors"
-
-	"github.com/gocql/gocql"
+	"fmt"
 
 	"waroeng_pgn1/domain"
 )
 
 type userRepository struct {
-	database   *gocql.Session
+	database   *sql.DB
 	collection string
 }
 
-func NewUserRepository(db *gocql.Session, collection string) domain.UserRepository {
+func NewUserRepository(db *sql.DB, collection string) domain.UserRepository {
 	return &userRepository{
 		database:   db,
 		collection: collection,
@@ -22,9 +22,32 @@ func NewUserRepository(db *gocql.Session, collection string) domain.UserReposito
 }
 
 func (ur *userRepository) Create(c context.Context, user *domain.User) error {
+	// sqlStatement := `INSERT INTO products (id_jenis, gambar, judul, deskripsi, ukuran, kondisi, harga, kuantitas) VALUES (?, ?, ?, ?,? ,? ,? ,?);`
 
-	query := ur.database.Query(`INSERT INTO users (id, email, password, name, phone_number) VALUES (?, ?, ?, ?, ?)`, user.ID, user.Email, user.Password, user.Name, user.PhoneNumber).Exec()
-	if query == nil {
+	// stmt, err := a.db.Prepare(sqlStatement)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// defer stmt.Close()
+
+	// result, err := stmt.Exec(Idjenis, Gambar, Judul, Deskripsi, Ukuran, Kondisi, Harga, Kuantitas)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// return result.LastInsertId()
+
+	stmt, err := ur.database.Prepare(`INSERT INTO users (id, email, password, name, phone_number) VALUES (?, ?, ?, ?, ?);`)
+	if err != nil {
+		panic(err)
+	}
+
+	defer stmt.Close()
+	result, err := stmt.Exec(user.ID, user.Email, user.Password, user.Name, user.PhoneNumber)
+	if err != nil {
+		return err
+	} else if result != nil {
 		return nil
 	}
 
@@ -56,11 +79,45 @@ func (ur *userRepository) Create(c context.Context, user *domain.User) error {
 
 func (ur *userRepository) GetByEmail(c context.Context, email string) (domain.User, error) {
 	var user domain.User
-	query := `SELECT id, email, password, name, phone_number FROM users WHERE email = ?`
-	err := ur.database.Query(query, email).Scan(&user.ID, &user.Email, &user.Password, &user.Name, &user.PhoneNumber)
+	// rows, err := a.db.Query(`
+	// SELECT
+	// 	products.Id,
+	// 	jenis_products.Jenis AS jenis_products,
+	// 	products.gambar,
+	// 	products.Judul,
+	// 	products.deskripsi,
+	// 	products.ukuran,
+	// 	products.harga
+	// FROM products
+	// INNER JOIN jenis_products
+	// ON products.Id_jenis = jenis_products.Id`)
+	// if err != nil {
+	// 	return []Task{}, err
+	// }
+	// query := ``
+	fmt.Println("MASUK SINI GK SIH")
+	// err := ur.database.Query(query, email).Scan(&user.ID, &user.Email, &user.Password, &user.Name, &user.PhoneNumber)
+	userRow, err := ur.database.Query(`SELECT id, email, password, name, phone_number FROM users WHERE email = masbro2@email.com`)
 	if err != nil {
 		return user, errors.New("error get user by email")
 	}
+	// defer userRow.Close()
+	for userRow.Next() {
+		err = userRow.Scan(&user.ID, &user.Email, &user.Name, &user.Password, &user.PhoneNumber)
+		if err != nil {
+			return user, err
+		}
+	}
+	// result := []Task{}
+	// for rows.Next() {
+	// 	admin := Task{}
+	// 	err = rows.Scan(&admin.Id, &admin.JenisProducts, &admin.Gambar, &admin.Judul, &admin.Deskripsi, &admin.Ukuran, &admin.Harga)
+	// 	if err != nil {
+	// 		return []Task{}, err
+	// 	}
+	// 	result = append(result, admin)
+	// }
+
 	return user, nil
 }
 

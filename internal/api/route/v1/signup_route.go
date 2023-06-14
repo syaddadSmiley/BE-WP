@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"time"
 
 	"waroeng_pgn1/domain"
@@ -10,10 +11,9 @@ import (
 	"waroeng_pgn1/internal/usecase"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gocql/gocql"
 )
 
-func NewSignupRouter(env *bootstrap.Env, timeout time.Duration, db *gocql.Session, group *gin.RouterGroup) {
+func NewSignupRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, group *gin.RouterGroup) {
 	ur := repository.NewUserRepository(db, domain.CollectionUser)
 	sc := controller.SignupController{
 		SignupUsecase: usecase.NewSignupUsecase(ur, timeout),

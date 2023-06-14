@@ -1,16 +1,16 @@
 package route
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gocql/gocql"
 
 	// "waroeng_pgn1/api/middleware"
 	"waroeng_pgn1/internal/bootstrap"
 )
 
-func Setup(env *bootstrap.Env, timeout time.Duration, db *gocql.Session, routerV1 *gin.RouterGroup) {
+func Setup(env *bootstrap.Env, timeout time.Duration, db *sql.DB, routerV1 *gin.RouterGroup) {
 	publicRouterV1 := routerV1.Group("")
 	// All Public APIs
 	NewSignupRouter(env, timeout, db, publicRouterV1)
