@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	// "waroeng_pgn1/api/middleware"
+	"waroeng_pgn1/internal/api/middleware"
 	"waroeng_pgn1/internal/bootstrap"
 )
 
@@ -17,10 +17,11 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *sql.DB, routerV1 *gin.
 	NewLoginRouter(env, timeout, db, publicRouterV1)
 	// NewRefreshTokenRouter(env, timeout, db, publicRouterV1)
 
-	// protectedRouterV1 := routerV1.Group("")
-	// // Middleware to verify AccessToken
-	// protectedRouterV1.Use(middleware.JwtAuthMiddleware(env.AccessTokenSecret))
-	// // All Private APIs
+	protectedAdminRouterV1 := routerV1.Group("")
+	// Middleware to verify AccessToken
+	protectedAdminRouterV1.Use(middleware.JwtAuthAdminMiddleware(env.AccessTokenSecret))
+	// All Private APIs
+	NewProductRouter(env, timeout, db, protectedAdminRouterV1)
 	// NewProfileRouter(env, timeout, db, protectedRouterV1)
 	// NewTaskRouter(env, timeout, db, protectedRouterV1)
 }
