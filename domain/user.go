@@ -9,11 +9,15 @@ const (
 )
 
 type User struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Email       string `json:"email"`
-	Password    string `json:"-"`
-	PhoneNumber string `json:"phone_number"`
+	ID                    string `json:"id"`
+	Name                  string `json:"name"`
+	Email                 string `json:"email"`
+	EmailVerifiedAt       string `json:"-"`
+	Password              string `json:"-"`
+	PhoneNumber           string `json:"phone_number"`
+	PhoneNumberVerifiedAt string `json:"-"`
+	ProfilePhotoLink      string `json:"profile_photo_link"`
+	Role                  string `json:"-"`
 }
 
 type UserRepository interface {

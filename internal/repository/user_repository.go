@@ -38,13 +38,13 @@ func (ur *userRepository) Create(c context.Context, user *domain.User) error {
 
 	// return result.LastInsertId()
 
-	stmt, err := ur.database.Prepare(`INSERT INTO users (id, email, password, name, phone_number) VALUES (?, ?, ?, ?, ?);`)
+	stmt, err := ur.database.Prepare(`INSERT INTO users (id, email, password, name, phone_number, role) VALUES (?, ?, ?, ?, ?, ?);`)
 	if err != nil {
 		panic(err)
 	}
 
 	defer stmt.Close()
-	result, err := stmt.Exec(user.ID, user.Email, user.Password, user.Name, user.PhoneNumber)
+	result, err := stmt.Exec(user.ID, user.Email, user.Password, user.Name, user.PhoneNumber, "user_wp")
 	if err != nil {
 		return err
 	} else if result != nil {
@@ -97,13 +97,13 @@ func (ur *userRepository) GetByEmail(c context.Context, email string) (domain.Us
 	// query := ``
 	fmt.Println("MASUK SINI GK SIH")
 	// err := ur.database.Query(query, email).Scan(&user.ID, &user.Email, &user.Password, &user.Name, &user.PhoneNumber)
-	userRow, err := ur.database.Query(`SELECT id, email, password, name, phone_number FROM users WHERE email = masbro2@email.com`)
+	userRow, err := ur.database.Query(`SELECT id, email, password, name, phone_number FROM users WHERE email = ?`, email)
 	if err != nil {
 		return user, errors.New("error get user by email")
 	}
 	// defer userRow.Close()
 	for userRow.Next() {
-		err = userRow.Scan(&user.ID, &user.Email, &user.Name, &user.Password, &user.PhoneNumber)
+		err = userRow.Scan(&user.ID, &user.Email, &user.Password, &user.Name, &user.PhoneNumber)
 		if err != nil {
 			return user, err
 		}
