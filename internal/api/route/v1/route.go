@@ -24,4 +24,11 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *sql.DB, routerV1 *gin.
 	NewProductRouter(env, timeout, db, protectedAdminRouterV1)
 	// NewProfileRouter(env, timeout, db, protectedRouterV1)
 	// NewTaskRouter(env, timeout, db, protectedRouterV1)
+
+	protectedUserRouterV1 := routerV1.Group("")
+	// Middleware to verify AccessToken
+	protectedUserRouterV1.Use(middleware.JwtAuthMiddleware(env.AccessTokenSecret))
+	// All Private APIs
+	NewAddressesRouter(env, timeout, db, protectedUserRouterV1)
+
 }

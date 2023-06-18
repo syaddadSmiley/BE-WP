@@ -20,4 +20,6 @@ func NewProductRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, gro
 		Env:            env,
 	}
 	group.POST("/product/create", pc.Create)
+	group.GET("/product/get/:id", pc.GetById)
+	group.GET("/product/getall", pc.GetAll)
 }

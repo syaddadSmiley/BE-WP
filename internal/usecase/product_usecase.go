@@ -31,6 +31,12 @@ func (pu *productUsecase) GetById(c context.Context, productID string) (domain.P
 	return pu.productRepository.GetById(ctx, productID)
 }
 
+func (pu *productUsecase) GetAll(c context.Context) ([]domain.Product, error) {
+	ctx, cancel := context.WithTimeout(c, pu.contextTimeout)
+	defer cancel()
+	return pu.productRepository.GetAll(ctx)
+}
+
 // func (tu *ProductUsecase) FetchByUserID(c context.Context, userID string) ([]domain.Task, error) {
 // 	ctx, cancel := context.WithTimeout(c, tu.contextTimeout)
 // 	defer cancel()

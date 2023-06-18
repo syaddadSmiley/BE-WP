@@ -36,3 +36,25 @@ func (pc *ProductController) Create(c *gin.Context) {
 		Message: "Product created successfully",
 	})
 }
+
+func (pc *ProductController) GetById(c *gin.Context) {
+	id := c.Param("id")
+
+	product, err := pc.ProductUsecase.GetById(c, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, product)
+}
+
+func (pc *ProductController) GetAll(c *gin.Context) {
+	products, err := pc.ProductUsecase.GetAll(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, products)
+}
