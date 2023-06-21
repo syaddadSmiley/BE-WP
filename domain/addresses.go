@@ -19,7 +19,7 @@ type Addresses struct {
 	Latitude     string `json:"latitude"`
 	Longitude    string `json:"longitude"`
 	Note         string `json:"note"`
-	IsDefault    string `json:"is_default"`
+	IsDefault    bool   `json:"is_default"`
 }
 
 type AddressesRepository interface {

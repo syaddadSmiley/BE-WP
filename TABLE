@@ -1,0 +1,74 @@
+CREATE TABLE waroeng_pgn1.users (
+	id VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    email_verified_at TIMESTAMP NULL,
+    name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(255) NOT NULL,
+    phone_number_verified_at TIMESTAMP NULL,
+    profile_photo VARCHAR(255) NULL,
+    role VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    last_login TIMESTAMP NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE waroeng_pgn1.addresses (
+    id VARCHAR(255) NOT NULL,
+    id_user VARCHAR(255) NOT NULL,
+    label_address VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    city VARCHAR(255) NOT NULL,
+    province VARCHAR(255) NOT NULL,
+    postal_code VARCHAR(255) NOT NULL,
+    latitude VARCHAR(255) NOT NULL,
+    longitude VARCHAR(255) NOT NULL,
+    note VARCHAR(255) NULL,
+    is_default BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_user) REFERENCES users(id)
+);
+
+CREATE TABLE waroeng_pgn1.product (
+    id VARCHAR(255) NOT NULL,
+    id_price_type VARCHAR(255) NOT NULL,
+    id_unit_type VARCHAR(255) NOT NULL,
+    id_category VARCHAR(255) NOT NULL,
+    name_product VARCHAR(255) NOT NULL,
+    price DOUBLE NOT NULL,
+    description_product VARCHAR(255) NULL,
+    discount DOUBLE NULL,
+    sold_amount INT NOT NULL DEFAULT 0,
+    stock INT NOT NULL DEFAULT 0,
+    location VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    PRIMARY KEY (id)
+)
+
+ID           string `json:"id"`
+	IDUser       string `json:"id_user"`
+	IDCourier    string `json:"id_courier"`
+	IDAddress    string `json:"id_address"`
+	TotalPrice   string `json:"total_price"`
+	StatusOrder  string `json:"status_order"`
+	DeliveryType string `json:"delivery_type"`
+
+CREATE TABLE order (
+    id VARCHAR(255) NOT NULL,
+    id_user VARCHAR(255) NOT NULL,
+    id_courier VARCHAR(255) NOT NULL,
+    id_address VARCHAR(255) NOT NULL,
+    total_price DOUBLE NOT NULL,
+    status_order VARCHAR(255) NOT NULL,
+    delivery_type VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_user) REFERENCES users(id),
+    FOREIGN KEY (id_courier) REFERENCES courier(id),
+    FOREIGN KEY (id_address) REFERENCES addresses(id)
+);

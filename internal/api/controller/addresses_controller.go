@@ -37,6 +37,18 @@ func (pc *AddressesController) Create(c *gin.Context) {
 		return
 	}
 
+	listAddresses, err := pc.AddressesUsecase.GetByIdUser(c, addresses.IDUser)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	if len(listAddresses) > 0 {
+		addresses.IsDefault = false
+	} else {
+		addresses.IsDefault = true
+	}
+
 	err = pc.AddressesUsecase.Create(c, &addresses)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})

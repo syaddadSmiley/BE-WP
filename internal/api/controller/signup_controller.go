@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"waroeng_pgn1/domain"
@@ -26,9 +27,13 @@ func (sc *SignupController) Signup(c *gin.Context) {
 		return
 	}
 
-	_, err = sc.SignupUsecase.GetUserByEmail(c, request.Email)
-	if err == nil {
-		c.JSON(http.StatusConflict, domain.ErrorResponse{Message: "User already exists with the given email"})
+	checkUser, err := sc.SignupUsecase.GetUserByEmail(c, request.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+	if checkUser.ID != "" {
+		c.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: fmt.Sprintf("Email %s already exist", request.Email)})
 		return
 	}
 
