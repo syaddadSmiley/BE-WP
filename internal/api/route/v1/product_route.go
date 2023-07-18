@@ -13,7 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewProductRouterAdmin(env *bootstrap.Env, timeout time.Duration, db *sql.DB, group *gin.RouterGroup) {
+func NewProductRouterGudang(env *bootstrap.Env, timeout time.Duration, db *sql.DB, group *gin.RouterGroup) {
 	pr := repository.NewProductRepository(db, domain.CollectionProduct)
 	pc := &controller.ProductController{
 		ProductUsecase: usecase.NewProductUsecase(pr, timeout),
@@ -31,5 +31,5 @@ func NewProductRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, gro
 		Env:            env,
 	}
 	group.GET("/product/get/:id", pc.GetById)
-	group.GET("/product/getall", pc.GetAll)
+	group.GET("/product/getbycity/", pc.GetAllByCity)
 }

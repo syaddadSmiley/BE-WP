@@ -64,16 +64,17 @@ func IsAuthorizedAdmin(requestToken string, secret string) (bool, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		fmt.Println(token)
+
 		return []byte(secret), nil
 	})
+
 	if err != nil {
 		return false, err
 	}
 	return true, nil
 }
 
-func ExtractIDFromToken(requestToken string, secret string) (string, error) {
+func ExtractSomeFromToken(requestToken string, secret string, getWhat string) (string, error) {
 	token, err := jwt.Parse(requestToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -91,5 +92,11 @@ func ExtractIDFromToken(requestToken string, secret string) (string, error) {
 		return "", fmt.Errorf("invalid token")
 	}
 
-	return claims["id"].(string), nil
+	if getWhat == "id" {
+		return claims["id"].(string), nil
+	} else if getWhat == "role" {
+		return claims["role"].(string), nil
+	}
+
+	return "", nil
 }

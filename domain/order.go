@@ -9,13 +9,13 @@ const (
 )
 
 type Order struct {
-	ID           string `json:"id"`
-	IDUser       string `json:"id_user"`
-	IDCourier    string `json:"id_courier"`
-	IDAddress    string `json:"id_address"`
-	TotalPrice   string `json:"total_price"`
-	StatusOrder  string `json:"status_order"`
-	DeliveryType string `json:"delivery_type"`
+	ID                 string `json:"id"`
+	IDUser             string `json:"id_user"`
+	IDCourier          string `json:"id_courier"`
+	IDAddress          string `json:"id_address"`
+	TotalPrice         string `json:"total_price"`
+	CurrentStatusOrder string `json:"current_status_order"`
+	IsRefund           bool   `json:"is_refund"`
 }
 
 type OrderRepository interface {

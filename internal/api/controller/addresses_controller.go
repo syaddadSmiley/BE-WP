@@ -31,7 +31,7 @@ func (pc *AddressesController) Create(c *gin.Context) {
 	}
 
 	addresses.ID = gocql.TimeUUID().String()
-	addresses.IDUser, err = tokenutil.ExtractIDFromToken(token, bootstrap.NewEnv().AccessTokenSecret)
+	addresses.IDUser, err = tokenutil.ExtractSomeFromToken(token, bootstrap.NewEnv().AccessTokenSecret, "id")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
 		return
@@ -75,7 +75,7 @@ func (pc *AddressesController) GetById(c *gin.Context) {
 func (pc *AddressesController) GetByIdUser(c *gin.Context) {
 	auth_header := c.Request.Header.Get("Authorization")
 	token := strings.Split(auth_header, " ")[1]
-	id, err := tokenutil.ExtractIDFromToken(token, bootstrap.NewEnv().AccessTokenSecret)
+	id, err := tokenutil.ExtractSomeFromToken(token, bootstrap.NewEnv().AccessTokenSecret, "id")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
 		return

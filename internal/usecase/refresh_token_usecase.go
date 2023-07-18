@@ -34,5 +34,5 @@ func (rtu *refreshTokenUsecase) CreateRefreshToken(user *domain.User, secret str
 }
 
 func (rtu *refreshTokenUsecase) ExtractIDFromToken(requestToken string, secret string) (string, error) {
-	return tokenutil.ExtractIDFromToken(requestToken, secret)
+	return tokenutil.ExtractSomeFromToken(requestToken, secret, "id")
 }
