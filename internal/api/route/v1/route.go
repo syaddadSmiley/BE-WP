@@ -34,5 +34,7 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *sql.DB, routerV1 *gin.
 	protectedUserRouterV1.Use(middleware.JwtAuthMiddleware(env.AccessTokenSecret))
 	// All Private APIs
 	NewAddressesRouter(env, timeout, db, protectedUserRouterV1)
+	NewOrderRouter(env, timeout, db, protectedUserRouterV1)
+	NewCourierServiceRouter(env, timeout, db, protectedUserRouterV1)
 
 }

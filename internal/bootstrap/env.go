@@ -20,6 +20,7 @@ type Env struct {
 	AccessTokenSecret      string `mapstructure:"ACCESS_TOKEN_SECRET"`
 	RefreshTokenSecret     string `mapstructure:"REFRESH_TOKEN_SECRET"`
 	RajaOngkirKey          string `mapstructure:"RAJA_ONGKIR_KEY"`
+	MidtransKey            string `mapstructure:"MIDTRANS_KEY"`
 }
 
 func NewEnv() *Env {
