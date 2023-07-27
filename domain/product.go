@@ -24,7 +24,8 @@ type Product struct {
 
 type ProductResponse struct {
 	ID                 string `json:"id"`
-	IDCategory         string `json:"id_category"`
+	NameCategory       string `json:"name_category"`
+	TypeCategory       string `json:"type_category"`
 	UnitTypeValue      string `json:"unit_type_value"`
 	UnitTypeName       string `json:"unit_type_name"`
 	NameProduct        string `json:"name_product" form:"name_product" binding:"required"`
@@ -39,13 +40,15 @@ type ProductResponse struct {
 type ProductRepository interface {
 	Create(c context.Context, product *Product) error
 	GetById(c context.Context, id string) (Product, error)
-	GetAll(c context.Context) ([]Product, error)
+	GetAll(c context.Context) ([]ProductResponse, error)
 	GetAllByCity(c context.Context, city string) ([]ProductResponse, error)
+	GetAllByCategory(c context.Context, idCategory string, city string) ([]ProductResponse, error)
 }
 
 type ProductUsecase interface {
 	Create(c context.Context, product *Product) error
 	GetById(c context.Context, id string) (Product, error)
-	GetAll(c context.Context) ([]Product, error)
+	GetAll(c context.Context) ([]ProductResponse, error)
 	GetAllByCity(c context.Context, city string) ([]ProductResponse, error)
+	GetAllByCategory(c context.Context, idCategory string, city string) ([]ProductResponse, error)
 }

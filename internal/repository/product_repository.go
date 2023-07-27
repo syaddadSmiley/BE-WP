@@ -21,14 +21,14 @@ func NewProductRepository(db *sql.DB, collection string) domain.ProductRepositor
 	}
 }
 
-func (ur *productRepository) Create(c context.Context, product *domain.Product) error {
-	stmt, err := ur.database.Prepare(`INSERT INTO product (id, unit_type_value, id_unit_type, name_product, price, description_product, discount, sold_amount, stock,  location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+func (pr *productRepository) Create(c context.Context, product *domain.Product) error {
+	stmt, err := pr.database.Prepare(`INSERT INTO product (id, unit_type_value, id_category, id_unit_type, name_product, price, description_product, discount, sold_amount, stock,  location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		panic(err)
 	}
 
 	defer stmt.Close()
-	result, err := stmt.Exec(product.ID, product.UnitTypeValue, product.IDUnitType, product.NameProduct, product.Price, product.DescriptionProduct, product.Discount, product.SoldAmount, product.Stock, product.Location)
+	result, err := stmt.Exec(product.ID, product.UnitTypeValue, product.IDCategory, product.IDUnitType, product.NameProduct, product.Price, product.DescriptionProduct, product.Discount, product.SoldAmount, product.Stock, product.Location)
 	if err != nil {
 		return err
 	} else if result != nil {
@@ -37,9 +37,9 @@ func (ur *productRepository) Create(c context.Context, product *domain.Product) 
 	return errors.New("error while creating product")
 }
 
-func (ur *productRepository) GetById(c context.Context, id string) (domain.Product, error) {
+func (pr *productRepository) GetById(c context.Context, id string) (domain.Product, error) {
 	var product domain.Product
-	stmt, err := ur.database.Prepare(`SELECT id, unit_type_value, id_unit_type, name_product, price, description_product, discount, sold_amount, stock, location FROM product WHERE id = ?`)
+	stmt, err := pr.database.Prepare(`SELECT id, unit_type_value, id_unit_type, name_product, price, description_product, discount, sold_amount, stock, location FROM product WHERE id = ?`)
 	if err != nil {
 		panic(err)
 	}
@@ -55,10 +55,16 @@ func (ur *productRepository) GetById(c context.Context, id string) (domain.Produ
 	return product, nil
 }
 
-func (ur *productRepository) GetAll(c context.Context) ([]domain.Product, error) {
-	var products []domain.Product
-	stmt, err := ur.database.Prepare(`SELECT 
-	id,  unit_type_value, name_product, price, description_product, discount, sold_amount, stock, location FROM product INNER JOIN unit_type_name ON product.id_unit_type = unit_type_value.id`)
+func (pr *productRepository) GetAll(c context.Context) ([]domain.ProductResponse, error) {
+	var products []domain.ProductResponse
+	stmt, err := pr.database.Prepare(`SELECT 
+	p.id, 
+	p.unit_type_value, 
+	cp.name_category,
+	p.name_product, 
+	p.price, 
+	p.description_product, 
+	p.discount, p.sold_amount, p.stock, p.location, ut.unit_type_name FROM product p INNER JOIN unit_type ut ON p.id_unit_type = ut.id RIGHT JOIN category_product cp ON cp.id = p.id_category`)
 	if err != nil {
 		panic(err)
 	}
@@ -70,8 +76,8 @@ func (ur *productRepository) GetAll(c context.Context) ([]domain.Product, error)
 	}
 
 	for rows.Next() {
-		var product domain.Product
-		err = rows.Scan(&product.ID, &product.UnitTypeValue, &product.NameProduct, &product.Price, &product.DescriptionProduct, &product.Discount, &product.SoldAmount, &product.Stock, &product.Location, &product.UnitTypeValue)
+		var product domain.ProductResponse
+		err = rows.Scan(&product.ID, &product.UnitTypeValue, &product.NameCategory, &product.NameProduct, &product.Price, &product.DescriptionProduct, &product.Discount, &product.SoldAmount, &product.Stock, &product.Location, &product.UnitTypeValue)
 		if err != nil {
 			return products, err
 		}
@@ -82,16 +88,18 @@ func (ur *productRepository) GetAll(c context.Context) ([]domain.Product, error)
 	return products, nil
 }
 
-func (ur *productRepository) GetAllByCity(c context.Context, city string) ([]domain.ProductResponse, error) {
+func (pr *productRepository) GetAllByCity(c context.Context, city string) ([]domain.ProductResponse, error) {
 	fmt.Println("city", city)
 	var products []domain.ProductResponse
-	stmt, err := ur.database.Prepare(`SELECT 
-		p.id, 
-		p.unit_type_value, 
-		p.name_product, 
-		p.price, 
-		p.description_product, 
-		p.discount, p.sold_amount, p.stock, p.location, ut.unit_type_name FROM product p INNER JOIN unit_type ut ON p.id_unit_type = ut.id WHERE p.location = ?`)
+	stmt, err := pr.database.Prepare(`SELECT 
+	p.id, 
+	p.unit_type_value, 
+	cp.type_category,
+	cp.name_category,
+	p.name_product, 
+	p.price, 
+	p.description_product, 
+	p.discount, p.sold_amount, p.stock, p.location, ut.unit_type_name FROM product p INNER JOIN unit_type ut ON p.id_unit_type = ut.id RIGHT JOIN category_product cp ON cp.id = p.id_category WHERE p.location = ?;`)
 	if err != nil {
 		panic(err)
 	}
@@ -104,7 +112,41 @@ func (ur *productRepository) GetAllByCity(c context.Context, city string) ([]dom
 
 	for rows.Next() {
 		var product domain.ProductResponse
-		err = rows.Scan(&product.ID, &product.UnitTypeValue, &product.NameProduct, &product.Price, &product.DescriptionProduct, &product.Discount, &product.SoldAmount, &product.Stock, &product.Location, &product.UnitTypeName)
+		err = rows.Scan(&product.ID, &product.UnitTypeValue, &product.TypeCategory, &product.NameCategory, &product.NameProduct, &product.Price, &product.DescriptionProduct, &product.Discount, &product.SoldAmount, &product.Stock, &product.Location, &product.UnitTypeName)
+		if err != nil {
+			return products, err
+		}
+
+		products = append(products, product)
+	}
+
+	return products, nil
+}
+
+func (pr *productRepository) GetAllByCategory(c context.Context, category string, city string) ([]domain.ProductResponse, error) {
+	var products []domain.ProductResponse
+	stmt, err := pr.database.Prepare(`SELECT 
+	p.id, 
+	p.unit_type_value, 
+	cp.type_category,
+	cp.name_category,
+	p.name_product, 
+	p.price, 
+	p.description_product, 
+	p.discount, p.sold_amount, p.stock, p.location, ut.unit_type_name FROM product p INNER JOIN unit_type ut ON p.id_unit_type = ut.id RIGHT JOIN category_product cp ON cp.id = p.id_category WHERE p.location = ? AND cp.type_category = ?;`)
+	if err != nil {
+		panic(err)
+	}
+
+	defer stmt.Close()
+	rows, err := stmt.Query(city, category)
+	if err != nil {
+		return products, err
+	}
+
+	for rows.Next() {
+		var product domain.ProductResponse
+		err = rows.Scan(&product.ID, &product.UnitTypeValue, &product.TypeCategory, &product.NameCategory, &product.NameProduct, &product.Price, &product.DescriptionProduct, &product.Discount, &product.SoldAmount, &product.Stock, &product.Location, &product.UnitTypeName)
 		if err != nil {
 			return products, err
 		}

@@ -28,6 +28,8 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *sql.DB, routerV1 *gin.
 	NewProductRouterGudang(env, timeout, db, protectedAdminRouterV1)
 	NewCourierRouterGudang(env, timeout, db, protectedAdminRouterV1)
 	NewUnitTypeRouter(env, timeout, db, protectedAdminRouterV1)
+	NewCategoryProductRouter(env, timeout, db, protectedAdminRouterV1)
+	NewOrderRouterGudang(env, timeout, db, protectedAdminRouterV1)
 
 	protectedUserRouterV1 := routerV1.Group("")
 	// Middleware to verify AccessToken

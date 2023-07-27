@@ -20,13 +20,20 @@ type Order struct {
 	IsRefund           bool         `json:"is_refund"`
 }
 
+type OrderStatus struct {
+	ID      string `json:"id"`
+	IDOrder string `json:"id_order"`
+	Status  string `json:"status"`
+}
+
 type OrderItems struct {
-	ID        string `json:"id"`
-	IDOrder   string `json:"id_order"`
-	Name      string `json:"name"`
-	IDProduct string `json:"id_product"`
-	Quantity  string `json:"quantity"`
-	Price     string `json:"price"`
+	ID          string `json:"id"`
+	IDOrder     string `json:"id_order"`
+	Name        string `json:"name"`
+	IDProduct   string `json:"id_product"`
+	Quantity    string `json:"quantity"`
+	Price       string `json:"price"`
+	Description string `json:"description"`
 }
 
 // type OrderRequest struct {
@@ -38,16 +45,20 @@ type MidtransResponse struct {
 
 type OrderRepository interface {
 	Create(c context.Context, product *Order) error
+	CreateOrderStatus(c context.Context, orderStatus *OrderStatus) error
 	CreateOrderItem(c context.Context, orderItem *OrderItems) error
 	GetById(c context.Context, id string) (Order, error)
 	GetByIdUser(c context.Context, id string) ([]Order, error)
+	GetOrderItemsByIdOrder(c context.Context, orders []Order) ([]Order, error)
 	UpdateById(c context.Context, id string, order Order) (Order, error)
 }
 
 type OrderUsecase interface {
 	Create(c context.Context, product *Order) error
+	CreateOrderStatus(c context.Context, orderStatus *OrderStatus) error
 	CreateOrderItem(c context.Context, orderItem *OrderItems) error
 	GetById(c context.Context, id string) (Order, error)
 	GetByIdUser(c context.Context, id string) ([]Order, error)
+	GetOrderItemsByIdOrder(c context.Context, orders []Order) ([]Order, error)
 	UpdateById(c context.Context, id string, order Order) (Order, error)
 }

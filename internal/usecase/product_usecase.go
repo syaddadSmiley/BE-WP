@@ -31,7 +31,7 @@ func (pu *productUsecase) GetById(c context.Context, productID string) (domain.P
 	return pu.productRepository.GetById(ctx, productID)
 }
 
-func (pu *productUsecase) GetAll(c context.Context) ([]domain.Product, error) {
+func (pu *productUsecase) GetAll(c context.Context) ([]domain.ProductResponse, error) {
 	ctx, cancel := context.WithTimeout(c, pu.contextTimeout)
 	defer cancel()
 	return pu.productRepository.GetAll(ctx)
@@ -41,6 +41,12 @@ func (pu *productUsecase) GetAllByCity(c context.Context, city string) ([]domain
 	ctx, cancel := context.WithTimeout(c, pu.contextTimeout)
 	defer cancel()
 	return pu.productRepository.GetAllByCity(ctx, city)
+}
+
+func (pu *productUsecase) GetAllByCategory(c context.Context, category string, city string) ([]domain.ProductResponse, error) {
+	ctx, cancel := context.WithTimeout(c, pu.contextTimeout)
+	defer cancel()
+	return pu.productRepository.GetAllByCategory(ctx, category, city)
 }
 
 // func (tu *ProductUsecase) FetchByUserID(c context.Context, userID string) ([]domain.Task, error) {

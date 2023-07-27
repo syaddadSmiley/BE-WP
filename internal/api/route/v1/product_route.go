@@ -32,4 +32,5 @@ func NewProductRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, gro
 	}
 	group.GET("/product/get/:id", pc.GetById)
 	group.GET("/product/getbycity/", pc.GetAllByCity)
+	group.GET("/product/getbycategory/", pc.GetAllByCategory)
 }

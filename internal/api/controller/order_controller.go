@@ -46,7 +46,7 @@ func (oc *OrderController) Create(c *gin.Context) {
 
 	order.ID = gocql.TimeUUID().String()
 
-	order.CurrentStatusOrder = "Waiting for payment"
+	order.CurrentStatusOrder = "Menunggu Pembayaran"
 	if order.IsRefund {
 		order.IsRefund = false
 	}
@@ -56,6 +56,12 @@ func (oc *OrderController) Create(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
+
+	err = oc.OrderUsecase.CreateOrderStatus(c, &domain.OrderStatus{
+		ID:      gocql.TimeUUID().String(),
+		IDOrder: order.ID,
+		Status:  "Menunggu Pembayaran",
+	})
 
 	//count price
 	fmt.Println(order)
@@ -75,7 +81,6 @@ func (oc *OrderController) Create(c *gin.Context) {
 		totalPrice += convPricetoInt * qtyInt
 		orderItem.ID = gocql.TimeUUID().String()
 		orderItem.IDOrder = order.ID
-		orderItem.Name = "Product " + orderItem.IDProduct
 		err = oc.OrderUsecase.CreateOrderItem(c, &orderItem)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
@@ -175,7 +180,14 @@ func (oc *OrderController) GetById(c *gin.Context) {
 }
 
 func (oc *OrderController) GetByIdUser(c *gin.Context) {
-	id := c.Param("id")
+	authorization := c.Request.Header.Get("Authorization")
+	token := strings.Split(authorization, " ")[1]
+
+	id, err := tokenutil.ExtractSomeFromToken(token, oc.Env.AccessTokenSecret, "id")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
 
 	orders, err := oc.OrderUsecase.GetByIdUser(c, id)
 	if err != nil {
@@ -183,7 +195,13 @@ func (oc *OrderController) GetByIdUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, orders)
+	orderWithItems, err := oc.OrderUsecase.GetOrderItemsByIdOrder(c, orders)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, orderWithItems)
 }
 
 func (oc *OrderController) UpdateById(c *gin.Context) {

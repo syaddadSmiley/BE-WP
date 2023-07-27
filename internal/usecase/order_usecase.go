@@ -25,6 +25,12 @@ func (ou *orderUsecase) Create(c context.Context, order *domain.Order) error {
 	return ou.orderRepository.Create(ctx, order)
 }
 
+func (ou *orderUsecase) CreateOrderStatus(c context.Context, orderStatus *domain.OrderStatus) error {
+	ctx, cancel := context.WithTimeout(c, ou.contextTimeout)
+	defer cancel()
+	return ou.orderRepository.CreateOrderStatus(ctx, orderStatus)
+}
+
 func (ou *orderUsecase) CreateOrderItem(c context.Context, orderItem *domain.OrderItems) error {
 	ctx, cancel := context.WithTimeout(c, ou.contextTimeout)
 	defer cancel()
@@ -41,6 +47,12 @@ func (ou *orderUsecase) GetByIdUser(c context.Context, userID string) ([]domain.
 	ctx, cancel := context.WithTimeout(c, ou.contextTimeout)
 	defer cancel()
 	return ou.orderRepository.GetByIdUser(ctx, userID)
+}
+
+func (ou *orderUsecase) GetOrderItemsByIdOrder(c context.Context, orders []domain.Order) ([]domain.Order, error) {
+	ctx, cancel := context.WithTimeout(c, ou.contextTimeout)
+	defer cancel()
+	return ou.orderRepository.GetOrderItemsByIdOrder(ctx, orders)
 }
 
 func (ou *orderUsecase) UpdateById(c context.Context, orderID string, order domain.Order) (domain.Order, error) {

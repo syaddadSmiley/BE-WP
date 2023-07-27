@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"waroeng_pgn1/domain"
@@ -69,6 +70,20 @@ func (pc *ProductController) GetAllByCity(c *gin.Context) {
 	city := c.Query("city")
 
 	products, err := pc.ProductUsecase.GetAllByCity(c, city)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, products)
+}
+
+func (pc *ProductController) GetAllByCategory(c *gin.Context) {
+	category := c.Query("category")
+	city := c.Query("city")
+	fmt.Println("ANJG", category, city)
+
+	products, err := pc.ProductUsecase.GetAllByCategory(c, category, city)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
 		return
