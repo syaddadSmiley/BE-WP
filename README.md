@@ -1,4 +1,4 @@
-## E-commerce Android Server using Gin Golang and ReactJS 
+## E-commerce Android Server using Gin Golang and Flutter Android
 
 ### Android User Interface : [The Android UI using Flutter Framework](https://github.com/syaddadSmiley/BE_FE) 
 
