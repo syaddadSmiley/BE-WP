@@ -1,4 +1,6 @@
-## E-commerce Android Server using Gin Golang and ReactJS ( [The Android UI using Flutter Framework](https://github.com/syaddadSmiley/BE_FE) )
+## E-commerce Android Server using Gin Golang and ReactJS 
+
+### Android User Interface : [The Android UI using Flutter Framework](https://github.com/syaddadSmiley/BE_FE) 
 
 ### Key Features
 - **Gin Gonic**: A web framework written in Go (Golang).
